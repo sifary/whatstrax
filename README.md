@@ -56,7 +56,7 @@ npm run start:client
 
 Open `http://localhost:3000`, scan QR code with WhatsApp, then enter phone number to track (e.g., `491701234567`).
 
-### CLI Interface
+### CLI Interface (only WhatsApp)
 
 ```bash
 npm start
