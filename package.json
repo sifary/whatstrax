@@ -42,7 +42,11 @@
     "pino": "^10.1.0",
     "qrcode-terminal": "^0.12.0",
     "socket.io": "^4.8.1",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "cookie-session": "^2.0.0",
+    "express-session": "^1.17.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -51,7 +55,11 @@
     "@types/ws": "^8.18.1",
     "tailwindcss": "^3.4.18",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@types/passport": "^1.0.16",
+    "@types/passport-google-oauth20": "^2.0.14",
+    "@types/cookie-session": "^2.0.44",
+    "@types/express-session": "^1.17.10"
   },
   "private": true
 }
