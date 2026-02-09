@@ -34,6 +34,10 @@ sed -i "s|BACKEND_IMAGE_URL|$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backen
 
 gcloud run services replace service.deploy.yaml --region $REGION
 
+# Force new revision to pick up latest images
+echo "Forcing new revision..."
+gcloud run services update $SERVICE_NAME --region $REGION --image=$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/ingress:latest
+
 echo "Deployment submitted! Check the URL above."
 echo "IMPORTANT: Don't forget to add the Cloud Run URL to your Google OAuth 'Authorized redirect URIs':"
 echo "  https://<YOUR-SERVICE-URL>/auth/google/callback"

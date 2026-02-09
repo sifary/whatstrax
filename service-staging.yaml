@@ -1,0 +1,78 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: whatstrax-staging
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/launch-stage: BETA
+    run.googleapis.com/ingress: all
+    run.googleapis.com/description: "Whatstrax Staging: Enhancement testing environment"
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+        autoscaling.knative.dev/maxScale: "1" # CRITICAL: GCS FUSE concurrency limit
+        run.googleapis.com/cpu-throttling: "false" # Keep background polling active
+    spec:
+      serviceAccountName: whatstrax-identity
+      volumes:
+        - name: data-volume
+          csi:
+            driver: gcsfuse.run.googleapis.com
+            readOnly: false
+            volumeAttributes:
+              bucketName: CLOUD_STORAGE_BUCKET_NAME_STAGING
+              mountOptions: "implicit-dirs"
+      containers:
+        # 1. Ingress Container (Nginx serving React)
+        - name: ingress
+          image: INGRESS_IMAGE_URL
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+        # 2. Sidecar Container (Node.js Backend)
+        - name: backend
+          image: BACKEND_IMAGE_URL
+          env:
+            - name: PORT
+              value: "3001"
+            - name: NODE_ENV
+              value: "production"
+            - name: DATA_DIR
+              value: "/data"
+            - name: ALLOWED_EMAILS
+              value: "adfaizer@gmail.com"
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: whatstrax-google-client-id
+                  key: latest
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: whatstrax-google-client-secret
+                  key: latest
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: whatstrax-session-secret
+                  key: latest
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          startupProbe:
+            httpGet:
+              path: /api/auth/status
+              port: 3001
+            periodSeconds: 10
+            failureThreshold: 10
